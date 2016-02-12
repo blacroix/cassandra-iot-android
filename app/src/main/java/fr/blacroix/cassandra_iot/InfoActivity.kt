@@ -17,7 +17,7 @@ class InfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_info)
 
-        url.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(KEY_URL, ""))
+        url.setText(PreferenceManager.getDefaultSharedPreferences(this).getString(KEY_URL, MainActivity.URL))
         frequency.setText(PreferenceManager.getDefaultSharedPreferences(this).getLong(KEY_FREQUENCY, MainActivity.FREQUENCY).toString())
 
         save.setOnClickListener {

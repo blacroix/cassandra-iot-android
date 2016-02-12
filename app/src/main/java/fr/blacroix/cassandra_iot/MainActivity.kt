@@ -12,7 +12,6 @@ import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -20,11 +19,13 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.util.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
     companion object {
         val FREQUENCY: Long = 10000
+        val URL: String = "http://private-anon-ce4f5ccfd-mnantern.apiary-mock.com/data"
     }
 
     private val JSON: MediaType = MediaType.parse("application/json; charset=utf-8")
@@ -70,25 +71,24 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private fun submitSensorData() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
-        val url = preferences.getString(InfoActivity.KEY_URL, null)
-        if (!TextUtils.isEmpty(url)) {
-            val thread = Thread() {
-                val client = OkHttpClient()
-                val body = RequestBody.create(JSON, "{\"x\":$x,\"y\":$y,\"z\":$z,\"lum\":$lum}")
-                val request = Request.Builder()
-                        .url(url)
-                        .post(body)
-                        .build()
-                val response = client.newCall(request).execute()
-                if (response.code() == 200) {
-                    // Do nothing
-                } else {
-                    Snackbar.make(coodinatorLayout, "An error occurred: ${response.code()}", Snackbar.LENGTH_SHORT).show()
-                }
+        val url = preferences.getString(InfoActivity.KEY_URL, URL)
+        val date = Date()
+        val thread = Thread() {
+            val client = OkHttpClient()
+            val body = RequestBody.create(JSON, "[{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$lum\"},{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$x;$y;$z\"}]")
+            val request = Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build()
+            val response = client.newCall(request).execute()
+            if (response.code() == 201) {
+                // Do nothing
+            } else {
+                Snackbar.make(coodinatorLayout, "An error occurred: ${response.code()}", Snackbar.LENGTH_SHORT).show()
             }
-            thread.start()
-            handler.postDelayed(recursiveSubmit, preferences.getLong(InfoActivity.KEY_FREQUENCY, FREQUENCY))
         }
+        thread.start()
+        handler.postDelayed(recursiveSubmit, preferences.getLong(InfoActivity.KEY_FREQUENCY, FREQUENCY))
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
