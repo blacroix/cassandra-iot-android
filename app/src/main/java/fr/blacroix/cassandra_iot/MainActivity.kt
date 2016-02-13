@@ -87,15 +87,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val thread = Thread() {
             val client = OkHttpClient()
             val body = RequestBody.create(JSON, "[{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$lum\"},{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$x;$y;$z\"}]")
-            val request = Request.Builder()
-                    .url(url)
-                    .post(body)
-                    .build()
-            val response = client.newCall(request).execute()
-            if (response.code() == 201) {
-                // Do nothing
-            } else {
-                Snackbar.make(coodinatorLayout, "An error occurred: ${response.code()}", Snackbar.LENGTH_SHORT).show()
+            try {
+                val request = Request.Builder()
+                        .url(url)
+                        .post(body)
+                        .build()
+                val response = client.newCall(request).execute()
+                if (response.code() == 201) {
+                    // Do nothing
+                } else {
+                    Snackbar.make(coodinatorLayout, "An error occurred: ${response.code()}", Snackbar.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Snackbar.make(coodinatorLayout, "An error occurred: ${e.message}", Snackbar.LENGTH_SHORT).show()
             }
         }
         thread.start()
