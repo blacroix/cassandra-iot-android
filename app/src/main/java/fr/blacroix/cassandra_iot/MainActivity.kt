@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val date = Date()
         val thread = Thread() {
             val client = OkHttpClient()
-            val body = RequestBody.create(JSON, "[{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$lum\"},{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$x;$y;$z\"}]")
+            val body = RequestBody.create(JSON, "[{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$lum\"},{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"ACCELEROMETER\",\"eventTime\":\"$date\",\"value\":\"$x;$y;$z\"}]")
             try {
                 val request = Request.Builder()
                         .url(url)
