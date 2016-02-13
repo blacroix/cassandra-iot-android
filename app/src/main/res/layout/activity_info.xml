@@ -25,8 +25,18 @@
         android:layout_marginRight="6dp"
         android:layout_marginTop="20dp"
         android:hint="Service URL to post payload"
-        android:inputType="textUri"
+        android:inputType="textUri|textMultiLine"
+        android:maxLines="10"
         android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="Separate multiple URL by ;"
+        android:textSize="12sp"
+        android:textStyle="italic"/>
 
     <EditText
         android:id="@+id/frequency"

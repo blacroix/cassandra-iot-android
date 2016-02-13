@@ -82,27 +82,29 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     fun submitSensorData() {
         imageCenter.startAnimation(anim)
         val preferences = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
-        val url = preferences.getString(InfoActivity.KEY_URL, URL)
+        val urls = preferences.getString(InfoActivity.KEY_URL, URL)
         val date = Date()
-        val thread = Thread() {
-            val client = OkHttpClient()
-            val body = RequestBody.create(JSON, "[{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$lum\"},{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"ACCELEROMETER\",\"eventTime\":\"$date\",\"value\":\"$x;$y;$z\"}]")
-            try {
-                val request = Request.Builder()
-                        .url(url)
-                        .post(body)
-                        .build()
-                val response = client.newCall(request).execute()
-                if (response.code() == 201) {
-                    // Do nothing
-                } else {
-                    Snackbar.make(coodinatorLayout, "An error occurred: ${response.code()}", Snackbar.LENGTH_SHORT).show()
+        for (url in urls.split(";")) {
+            val thread = Thread() {
+                val client = OkHttpClient()
+                val body = RequestBody.create(JSON, "[{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"BRIGHTNESS\",\"eventTime\":\"$date\",\"value\":\"$lum\"},{\"smartphoneId\":\"${preferences.getString(App.DEVICE_ID_KEY, "")}\",\"type\":\"ACCELEROMETER\",\"eventTime\":\"$date\",\"value\":\"$x;$y;$z\"}]")
+                try {
+                    val request = Request.Builder()
+                            .url(url)
+                            .post(body)
+                            .build()
+                    val response = client.newCall(request).execute()
+                    if (response.code() == 201) {
+                        // Do nothing
+                    } else {
+                        Snackbar.make(coodinatorLayout, "An error occurred: ${response.code()}", Snackbar.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Snackbar.make(coodinatorLayout, "An error occurred: ${e.message}", Snackbar.LENGTH_SHORT).show()
                 }
-            } catch (e: Exception) {
-                Snackbar.make(coodinatorLayout, "An error occurred: ${e.message}", Snackbar.LENGTH_SHORT).show()
             }
+            thread.start()
         }
-        thread.start()
         handler.postDelayed(recursiveSubmit, preferences.getLong(InfoActivity.KEY_FREQUENCY, FREQUENCY))
     }
 
@@ -129,10 +131,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         handler.removeCallbacksAndMessages(null)
         sensorManager.unregisterListener(this)
-        super.onStop()
+        super.onDestroy()
     }
 
 }
