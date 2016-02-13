@@ -12,6 +12,7 @@ import android.preference.PreferenceManager
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -28,13 +29,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val URL: String = "http://private-anon-ce4f5ccfd-mnantern.apiary-mock.com/data"
     }
 
-    private val JSON: MediaType = MediaType.parse("application/json; charset=utf-8")
-    private var x: Float = 0f
-    private var y: Float = 0f
-    private var z: Float = 0f
-    private var lum: Float = 0f
-    private val handler: Handler = Handler()
-    private val recursiveSubmit = { submitSensorData() }
+    val JSON: MediaType = MediaType.parse("application/json; charset=utf-8")
+    var x: Float = 0f
+    var y: Float = 0f
+    var z: Float = 0f
+    var lum: Float = 0f
+    val handler: Handler = Handler()
+    val recursiveSubmit = { submitSensorData() }
+
+    val anim: Animation by lazy {
+        AnimationUtils.loadAnimation(this, R.anim.bounce_fade)
+    }
+
+    val sensorManager: SensorManager by lazy {
+        getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,17 +55,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             startActivityForResult(Intent(this, InfoActivity::class.java), 42)
         }
 
-        imageCenter.startAnimation(AnimationUtils.loadAnimation(this, R.anim.bounce_fade));
-
         registerSensorListener()
         submitSensorData()
     }
 
-    private fun registerSensorListener() {
-        val sensorManager: SensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    fun registerSensorListener() {
+        sensorManager.unregisterListener(this)
+
         val accelerometer: Sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val light: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT)
+
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
         if (light != null) {
             sensorManager.registerListener(this, light, SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -69,7 +79,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun submitSensorData() {
+    fun submitSensorData() {
+        imageCenter.startAnimation(anim)
         val preferences = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
         val url = preferences.getString(InfoActivity.KEY_URL, URL)
         val date = Date()
@@ -112,6 +123,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 }
             }
         }
+    }
+
+    override fun onStop() {
+        handler.removeCallbacksAndMessages(null)
+        sensorManager.unregisterListener(this)
+        super.onStop()
     }
 
 }
