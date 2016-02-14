@@ -20,6 +20,7 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -83,7 +84,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         imageCenter.startAnimation(anim)
         val preferences = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
         val urls = preferences.getString(InfoActivity.KEY_URL, URL)
-        val date = Date()
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
+        val date = sdf.format(Date())
         for (url in urls.split(";")) {
             val thread = Thread() {
                 val client = OkHttpClient()
