@@ -4,4 +4,4 @@ Send light and accelerometer sensor data to a configurable URL at a configurable
 
 ## Download
 
-Droidbin [Cassandra-iot](http://www.droidbin.com/p1abg6a6c0dd657o2h0efdouq3Dow)
+Droidbin [Cassandra-iot](http://www.droidbin.com/p1abgafatupb1c8310341q3s1vul3)
