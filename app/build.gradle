@@ -11,8 +11,8 @@ android {
         applicationId "fr.blacroix.cassandra_iot"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 4
-        versionName "v0.4"
+        versionCode 5
+        versionName "v0.5"
     }
 
     signingConfigs {
