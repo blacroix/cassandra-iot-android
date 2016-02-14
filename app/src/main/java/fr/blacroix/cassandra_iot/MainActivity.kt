@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this@MainActivity)
         val urls = preferences.getString(InfoActivity.KEY_URL, URL)
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"))
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
         val date = sdf.format(Date())
         for (url in urls.split(";")) {
             val thread = Thread() {
